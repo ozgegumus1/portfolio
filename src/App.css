@@ -1,0 +1,349 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.app-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+.scratch-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Üst Sağ Navigasyon */
+.top-right-nav {
+  position: fixed;
+  top: 32px;
+  right: 48px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 10;
+}
+
+.theme-toggle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.app-container.dark .theme-toggle {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.app-container.light .theme-toggle {
+  color: #111;
+  background: rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.08);
+}
+
+/* İçerik Yerleşimi */
+.content-layout {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  padding: 56px 64px;
+}
+
+/* Sol Üst Başlık Alanı */
+.hero-section {
+  position: absolute;
+  top: 56px;
+  left: 64px;
+  pointer-events: auto;
+}
+
+.small-name {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+.app-container.dark .small-name { color: #ffffff; }
+.app-container.light .small-name { color: #111111; }
+
+.main-title {
+  font-size: 4.5rem;
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin-bottom: 24px;
+}
+.app-container.dark .main-title { color: #ffffff; }
+.app-container.light .main-title { color: #111111; }
+
+.hero-desc {
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.app-container.dark .hero-desc { color: rgba(255, 255, 255, 0.85); }
+.app-container.light .hero-desc { color: rgba(17, 17, 17, 0.85); }
+
+/* Projeler Grid & Scroll Alanı */
+.projects-grid-container {
+  position: absolute;
+  top: 390px;
+  left: 64px;
+  right: 64px;
+  bottom: 40px;
+  overflow-y: auto;
+  padding-right: 12px;
+  pointer-events: auto;
+}
+
+.projects-grid-container::-webkit-scrollbar {
+  width: 6px;
+}
+.projects-grid-container::-webkit-scrollbar-thumb {
+  background: rgba(150, 150, 150, 0.3);
+  border-radius: 3px;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 36px;
+  padding-bottom: 20px;
+}
+
+@media (max-width: 1024px) {
+  .projects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Hakkımda ve Stack Bölümü Stilleri */
+.about-stack-container {
+  margin-top: 80px;
+  padding-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  max-width: 960px;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+.app-container.dark .section-title { color: #ffffff; }
+.app-container.light .section-title { color: #111111; }
+
+.about-text {
+  font-size: 1.1rem;
+  line-height: 1.75;
+  font-weight: 400;
+}
+.app-container.dark .about-text { color: rgba(255, 255, 255, 0.82); }
+.app-container.light .about-text { color: rgba(17, 17, 17, 0.82); }
+
+.stack-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.stack-tag {
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.stack-tag:hover {
+  transform: translateY(-2px);
+}
+
+.app-container.dark .stack-tag {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.app-container.light .stack-tag {
+  background: rgba(0, 0, 0, 0.06);
+  color: #111111;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* Proje Detay Modal Stilleri */
+.project-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+.project-modal-box {
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  animation: scaleUp 0.2s ease forwards;
+}
+.app-container.dark .project-modal-box {
+  background: #141417;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.app-container.light .project-modal-box {
+  background: #ffffff;
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.project-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.project-modal-header h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.close-modal-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.app-container.dark .close-modal-btn {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+.app-container.light .close-modal-btn {
+  color: #111;
+  background: rgba(0, 0, 0, 0.08);
+}
+.close-modal-btn:hover {
+  transform: scale(1.1);
+}
+
+.modal-project-desc {
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.modal-tag {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #ccc;
+}
+
+.modal-links {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.modal-link-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.live-btn {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.github-btn {
+  background: #27272a;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-link-btn:hover {
+  opacity: 0.9;
+}
