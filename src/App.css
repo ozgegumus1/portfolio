@@ -347,3 +347,114 @@ html, body, #root {
 .modal-link-btn:hover {
   opacity: 0.9;
 }
+
+/* ==========================================================
+   MOBİL UYUMLULUK (masaüstü stilleri yukarıda değişmeden durur)
+   ========================================================== */
+@media (max-width: 640px) {
+  /* Üst sağ nav: küçült, sıkıştır */
+  .top-right-nav {
+    top: 14px;
+    right: 14px;
+    gap: 8px;
+  }
+
+  .top-right-nav .specular-button--sm {
+    font-size: 0.72rem;
+    padding: 8px 14px;
+  }
+
+  .theme-toggle {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+  }
+
+  /* İçerik: absolute mikro-yönetim yerine akan (flex) düzen */
+  .content-layout {
+    display: flex;
+    flex-direction: column;
+    padding: 82px 20px 0;
+  }
+
+  /* Başlık bloğu artık normal akışta, taşma yapmaz */
+  .hero-section {
+    position: static;
+    padding: 0;
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .small-name {
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+  }
+
+  .main-title {
+    font-size: clamp(1.9rem, 9.5vw, 2.6rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+    word-break: keep-all;
+  }
+
+  .hero-desc {
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  /* Proje grid'i: kalan alanı doldur, içeride kaydır */
+  .projects-grid-container {
+    position: static;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: 24px;
+    padding: 0 2px 28px 0;
+  }
+
+  .projects-grid {
+    gap: 20px;
+  }
+
+  /* Hakkımda / Stack */
+  .about-stack-container {
+    margin-top: 40px;
+    padding-bottom: 48px;
+    gap: 36px;
+    text-align: left;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+
+  .about-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .stack-tag {
+    padding: 8px 14px;
+    font-size: 0.82rem;
+  }
+
+  /* Proje detay modalı */
+  .project-modal-overlay {
+    padding: 16px;
+  }
+
+  .project-modal-box {
+    padding: 20px;
+    border-radius: 16px;
+    max-height: 85vh;
+  }
+
+  .project-modal-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .modal-project-desc {
+    font-size: 0.92rem;
+  }
+}

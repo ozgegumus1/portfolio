@@ -144,8 +144,12 @@ export default function App() {
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
         strokesRef.current.forEach((p) => {
+          // Kuyruk efekti: opaklık düştükçe yarıçap da küçülür,
+          // böylece iz kayarken sivrilerek sönümlenir.
+          const r = p.radius * p.opacity;
+          if (r <= 0.5) return;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(0, 0, 0, ${p.opacity})`;
           ctx.fill();
         });
@@ -174,7 +178,7 @@ export default function App() {
           x: nx,
           y: ny,
           opacity: 1,
-          radius: 45
+          radius: 34
         });
       }
 
