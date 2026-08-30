@@ -3,6 +3,7 @@ import Iridescence from './Iridescence';
 import GradientWaves from './GradientWaves';
 import TiltedCard from './TiltedCard';
 import WarpText from './WarpText';
+import ErrorBoundary from './ErrorBoundary';
 import SpecularButton from './SpecularButton';
 import './App.css';
 
@@ -280,34 +281,38 @@ export default function App() {
         {/* Sol Üst Başlık */}
         <div className="hero-section">
           <span className="small-name">
-            <WarpText
-              text="Özge Gümüş"
-              className="warp-small-name"
-              color={theme === 'dark' ? '#ffffff' : '#111111'}
-              fontSize="clamp(0.85rem, 4vw, 1rem)"
-              fontWeight={600}
-              letterSpacing="-0.01em"
-              lineHeight={1}
-              warpStrength={0.05}
-              pointerInfluence={0.32}
-              pointerStrength={0.26}
-              refraction={0.012}
-            />
+            <ErrorBoundary fallback="Özge Gümüş">
+              <WarpText
+                text="Özge Gümüş"
+                className="warp-small-name"
+                color={theme === 'dark' ? '#ffffff' : '#111111'}
+                fontSize="clamp(0.85rem, 4vw, 1rem)"
+                fontWeight={600}
+                letterSpacing="-0.01em"
+                lineHeight={1}
+                warpStrength={0.05}
+                pointerInfluence={0.32}
+                pointerStrength={0.26}
+                refraction={0.012}
+              />
+            </ErrorBoundary>
           </span>
           <h1 className="main-title">
-            <WarpText
-              text={'SOFTWARE\nDEVELOPER'}
-              className="warp-main-title"
-              color={theme === 'dark' ? '#ffffff' : '#111111'}
-              fontSize="clamp(1.9rem, 9.5vw, 4.5rem)"
-              fontWeight={900}
-              letterSpacing="-0.04em"
-              lineHeight={0.95}
-              warpStrength={0.07}
-              pointerInfluence={0.38}
-              pointerStrength={0.34}
-              refraction={0.016}
-            />
+            <ErrorBoundary fallback="SOFTWARE DEVELOPER">
+              <WarpText
+                text={'SOFTWARE\nDEVELOPER'}
+                className="warp-main-title"
+                color={theme === 'dark' ? '#ffffff' : '#111111'}
+                fontSize="clamp(1.9rem, 9.5vw, 4.5rem)"
+                fontWeight={900}
+                letterSpacing="-0.04em"
+                lineHeight={0.95}
+                warpStrength={0.07}
+                pointerInfluence={0.38}
+                pointerStrength={0.34}
+                refraction={0.016}
+              />
+            </ErrorBoundary>
           </h1>
           <p className="hero-desc">
             Building high-performance websites with<br />
@@ -344,19 +349,21 @@ export default function App() {
         <div className="about-stack-container">
           <div className="about-section">
             <h2 className="section-title">
-              <WarpText
-                text="Hakkımda"
-                className="warp-section-title warp-heading-about"
-                color={theme === 'dark' ? '#ffffff' : '#111111'}
-                fontSize="clamp(1.5rem, 6vw, 2rem)"
-                fontWeight={800}
-                letterSpacing="-0.02em"
-                lineHeight={1}
-                warpStrength={0.05}
-                pointerInfluence={0.32}
-                pointerStrength={0.26}
-                refraction={0.012}
-              />
+              <ErrorBoundary fallback="Hakkımda">
+                <WarpText
+                  text="Hakkımda"
+                  className="warp-section-title warp-heading-about"
+                  color={theme === 'dark' ? '#ffffff' : '#111111'}
+                  fontSize="clamp(1.5rem, 6vw, 2rem)"
+                  fontWeight={800}
+                  letterSpacing="-0.02em"
+                  lineHeight={1}
+                  warpStrength={0.05}
+                  pointerInfluence={0.32}
+                  pointerStrength={0.26}
+                  refraction={0.012}
+                />
+              </ErrorBoundary>
             </h2>
             <p className="about-text">
               Siyaset Bilimi ve İşletme Yönetimi mezunuyum. Geliştirme sürecinde ön yüzde dinamik yapılara ve tip güvenliğine, arka planda ise veri tabanı yönetimi ile otomasyonlara odaklanıyorum. Projeleri, kullanıcı deneyiminden veri akışına kadar tüm teknik gereksinimleriyle bir bütün olarak ele alıyorum. Projelerimde dinamik veri yönetimi için API entegrasyonlarını ve Supabase'i aktif kullanıyor; arka plan süreçlerinde Python'dan yararlanıyorum. İş akışımda yapay zeka araçlarıyla geliştirme sürecini ve kod kalitesini optimize ediyorum. Ethical Hacker (siber güvenlik) eğitimim devam ediyor; Linux ve sanal makine (VirtualBox) ortamlarında rahatım. Sıfırdan tam fonksiyonel web uygulamaları geliştirebilecek teknik bağımsızlığa sahibim; temiz ve sürdürülebilir koda odaklanıyorum.
@@ -365,19 +372,21 @@ export default function App() {
 
           <div className="stack-section">
             <h2 className="section-title">
-              <WarpText
-                text="Stack"
-                className="warp-section-title warp-heading-stack"
-                color={theme === 'dark' ? '#ffffff' : '#111111'}
-                fontSize="clamp(1.5rem, 6vw, 2rem)"
-                fontWeight={800}
-                letterSpacing="-0.02em"
-                lineHeight={1}
-                warpStrength={0.05}
-                pointerInfluence={0.32}
-                pointerStrength={0.26}
-                refraction={0.012}
-              />
+              <ErrorBoundary fallback="Stack">
+                <WarpText
+                  text="Stack"
+                  className="warp-section-title warp-heading-stack"
+                  color={theme === 'dark' ? '#ffffff' : '#111111'}
+                  fontSize="clamp(1.5rem, 6vw, 2rem)"
+                  fontWeight={800}
+                  letterSpacing="-0.02em"
+                  lineHeight={1}
+                  warpStrength={0.05}
+                  pointerInfluence={0.32}
+                  pointerStrength={0.26}
+                  refraction={0.012}
+                />
+              </ErrorBoundary>
             </h2>
             <div className="stack-tags">
               {techStack.map((tech, index) => (

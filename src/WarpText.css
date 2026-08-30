@@ -15,3 +15,18 @@
   height: 100%;
   display: block;
 }
+
+/* WebGL bir sebeple (context limiti, gizlilik modu, font yüklenmesi vb.)
+   çalışmazsa metnin görünmez kalmaması için yedek: canvas hazır olana
+   kadar görünür, hazır olunca opaklığı 0'a iner. */
+.warp-text-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: pre-line;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}

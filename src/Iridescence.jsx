@@ -52,8 +52,15 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
   useEffect(() => {
     if (!ctnDom.current) return;
     const ctn = ctnDom.current;
-    const renderer = new Renderer();
-    const gl = renderer.gl;
+    let renderer;
+    let gl;
+    try {
+      renderer = new Renderer();
+      gl = renderer.gl;
+    } catch (error) {
+      console.warn('Iridescence: WebGL başlatılamadı, arkaplan efekti atlanıyor.', error);
+      return undefined;
+    }
     gl.clearColor(1, 1, 1, 1);
 
     let program;

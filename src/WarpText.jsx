@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Renderer, Program, Mesh, Triangle, Texture } from 'ogl';
 import './WarpText.css';
 
@@ -226,6 +226,7 @@ const WarpText = ({
   style
 }) => {
   const containerRef = useRef(null);
+  const [isReady, setIsReady] = useState(false);
   const propsRef = useRef({
     text,
     color,
@@ -370,9 +371,15 @@ const WarpText = ({
 
     const rasterize = async () => {
       const version = ++rasterVersion;
+      // document.fonts.ready bazı mobil tarayıcılarda (özellikle gizlilik
+      // modlarında) hiç çözülmeyebiliyor; 300ms sonra yine de devam ediyoruz
+      // ki metin sonsuza kadar boş kalmasın.
       if (document.fonts?.ready) {
         try {
-          await document.fonts.ready;
+          await Promise.race([
+            document.fonts.ready,
+            new Promise(resolve => setTimeout(resolve, 300))
+          ]);
         } catch (error) {
           void error;
         }
@@ -393,6 +400,7 @@ const WarpText = ({
       texture.image = textCanvas;
       texture.needsUpdate = true;
       renderOnce();
+      setIsReady(true);
     };
 
     const resize = () => {
@@ -417,6 +425,23 @@ const WarpText = ({
     };
 
     const onPointerLeave = () => {
+      pointer.activeTarget = 0;
+    };
+
+    const updatePointerFromTouch = touch => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
+      pointer.tx = (touch.clientX - rect.left) / rect.width;
+      pointer.ty = 1 - (touch.clientY - rect.top) / rect.height;
+      pointer.activeTarget = 1;
+    };
+
+    const onTouchMove = event => {
+      if (!event.touches || !event.touches[0]) return;
+      updatePointerFromTouch(event.touches[0]);
+    };
+
+    const onTouchEnd = () => {
       pointer.activeTarget = 0;
     };
 
@@ -484,6 +509,9 @@ const WarpText = ({
 
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerleave', onPointerLeave);
+    canvas.addEventListener('touchmove', onTouchMove, { passive: true });
+    canvas.addEventListener('touchend', onTouchEnd);
+    canvas.addEventListener('touchcancel', onTouchEnd);
     canvas.addEventListener('webglcontextlost', onContextLost, false);
     document.addEventListener('visibilitychange', onVisibility);
     mediaQuery?.addEventListener('change', onReducedMotion);
@@ -493,14 +521,23 @@ const WarpText = ({
     resize();
     raf = requestAnimationFrame(loop);
 
+    // Bazı mobil tarayıcılarda ilk ölçüm, layout tam oturmadan
+    // (0 genişlik/yükseklik) yapılabiliyor; kısa bir gecikmeyle
+    // tekrar deneyerek metnin boş kalmasını engelliyoruz.
+    const retryTimer = setTimeout(resize, 250);
+
     return () => {
       disposed = true;
       contextRef.current = null;
+      clearTimeout(retryTimer);
       if (raf) cancelAnimationFrame(raf);
       resizeObserver?.disconnect();
       intersectionObserver?.disconnect();
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerleave', onPointerLeave);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
+      canvas.removeEventListener('touchcancel', onTouchEnd);
       canvas.removeEventListener('webglcontextlost', onContextLost);
       document.removeEventListener('visibilitychange', onVisibility);
       mediaQuery?.removeEventListener('change', onReducedMotion);
@@ -521,7 +558,23 @@ const WarpText = ({
   }, []);
 
   return (
-    <div ref={containerRef} className={`warp-text ${className}`.trim()} style={style} role="img" aria-label={text} />
+    <div ref={containerRef} className={`warp-text ${className}`.trim()} style={style} role="img" aria-label={text}>
+      <span
+        className="warp-text-fallback"
+        style={{
+          color,
+          fontSize: getFontValue(fontSize),
+          fontWeight,
+          fontFamily,
+          letterSpacing: getFontValue(letterSpacing),
+          lineHeight: typeof lineHeight === 'number' ? lineHeight : undefined,
+          opacity: isReady ? 0 : 1
+        }}
+        aria-hidden="true"
+      >
+        {text}
+      </span>
+    </div>
   );
 };
 
