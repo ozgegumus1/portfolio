@@ -4,21 +4,40 @@
   padding: 0;
 }
 
-html, body, #root {
+html, body {
   width: 100%;
-  height: 100%;
-  overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* Eski Vite şablonundan kalan #root kısıtlamalarını (1126px genişlik,
+   kenar çizgisi, ortalanmış metin) etkisiz hale getiriyoruz; artık
+   sayfa app-container ile birlikte doğal akışta büyüyor. */
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-inline: none;
+  text-align: left;
+  min-height: auto;
+  display: block;
+}
+
 .app-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
   user-select: none;
+}
+
+/* Arkaplan Katmanı: WebGL efekti + kazıma canvas'ı her zaman
+   viewport'a sabit kalır, sayfa üzerinden kayar gibi görünür. */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .scratch-canvas {
@@ -73,21 +92,18 @@ html, body, #root {
   transform: scale(1.08);
 }
 
-/* İçerik Yerleşimi */
+/* İçerik Yerleşimi: artık normal, akan bir sayfa. Kaydırma tarayıcının
+   kendi sayfa kaydırmasıyla olur; iç içe "kutu" yok. */
 .content-layout {
-  position: absolute;
-  inset: 0;
+  position: relative;
   z-index: 2;
-  pointer-events: none;
-  padding: 56px 64px;
+  padding: 56px 64px 100px;
 }
 
-/* Sol Üst Başlık Alanı */
+/* Başlık Alanı */
 .hero-section {
-  position: absolute;
-  top: 56px;
-  left: 64px;
-  pointer-events: auto;
+  text-align: left;
+  margin-bottom: 64px;
 }
 
 .small-name {
@@ -118,31 +134,51 @@ html, body, #root {
 .app-container.dark .hero-desc { color: rgba(255, 255, 255, 0.85); }
 .app-container.light .hero-desc { color: rgba(17, 17, 17, 0.85); }
 
-/* Projeler Grid & Scroll Alanı */
-.projects-grid-container {
-  position: absolute;
-  top: 390px;
-  left: 64px;
-  right: 64px;
-  bottom: 40px;
-  overflow-y: auto;
-  padding-right: 12px;
-  pointer-events: auto;
+/* WarpText Sarmalayıcı Boyutları — WarpText metni her zaman kendi
+   kutusunun ortasına çizer, bu yüzden kutuyu metnin gerçek genişliğine
+   (ch birimiyle, responsive) yaklaştırıp sola yaslı görünümü koruyoruz.
+   min-height: 0, bileşenin varsayılan 220px tabanını iptal eder. */
+.warp-main-title,
+.warp-small-name,
+.warp-section-title {
+  min-height: 0;
+  max-width: 100%;
 }
 
-.projects-grid-container::-webkit-scrollbar {
-  width: 6px;
-}
-.projects-grid-container::-webkit-scrollbar-thumb {
-  background: rgba(150, 150, 150, 0.3);
-  border-radius: 3px;
+.warp-main-title {
+  font-size: clamp(1.9rem, 9.5vw, 4.5rem);
+  width: 9.15ch;
+  margin-left: -0.7ch;
+  height: clamp(76px, 23vw, 178px);
 }
 
+.warp-small-name {
+  font-size: clamp(0.85rem, 4vw, 1rem);
+  width: 11ch;
+  height: 24px;
+}
+
+.warp-section-title {
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  height: 44px;
+}
+
+.warp-heading-stack {
+  width: 4.9ch;
+  margin-left: -0.42ch;
+}
+
+.warp-heading-about {
+  width: 7.6ch;
+  margin-left: -0.62ch;
+}
+
+/* Projeler Grid */
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 36px;
-  padding-bottom: 20px;
+  margin-bottom: 88px;
 }
 
 @media (max-width: 1024px) {
@@ -153,18 +189,19 @@ html, body, #root {
 
 @media (max-width: 640px) {
   .projects-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
   }
 }
 
-/* Hakkımda ve Stack Bölümü Stilleri */
+/* Hakkımda ve Stack Bölümü — artık ayrı bir kaydırma kutusu değil,
+   sayfanın normal akışında, projelerin hemen altında. */
 .about-stack-container {
-  margin-top: 80px;
-  padding-bottom: 80px;
   display: flex;
   flex-direction: column;
   gap: 56px;
   max-width: 960px;
+  text-align: left;
 }
 
 .section-title {
@@ -370,19 +407,12 @@ html, body, #root {
     font-size: 16px;
   }
 
-  /* İçerik: absolute mikro-yönetim yerine akan (flex) düzen */
   .content-layout {
-    display: flex;
-    flex-direction: column;
-    padding: 82px 20px 0;
+    padding: 82px 20px 64px;
   }
 
-  /* Başlık bloğu artık normal akışta, taşma yapmaz */
   .hero-section {
-    position: static;
-    padding: 0;
-    max-width: 100%;
-    text-align: left;
+    margin-bottom: 32px;
   }
 
   .small-name {
@@ -403,25 +433,29 @@ html, body, #root {
     line-height: 1.45;
   }
 
-  /* Proje grid'i: kalan alanı doldur, içeride kaydır */
-  .projects-grid-container {
-    position: static;
-    flex: 1 1 auto;
-    min-height: 0;
-    margin-top: 24px;
-    padding: 0 2px 28px 0;
+  .projects-grid {
+    margin-bottom: 48px;
   }
 
-  .projects-grid {
-    gap: 20px;
+  /* Proje kartları: 260px sabit yükseklik yerine, iki sütuna uygun
+     bir en-boy oranı — TiltedCard'a satır içi verilen 260px'i
+     !important ile geçersiz kılıyoruz. */
+  .tilted-card-figure {
+    height: auto !important;
+    aspect-ratio: 4 / 3;
+  }
+  .tilted-card-inner,
+  .tilted-card-img {
+    height: 100% !important;
+  }
+  .tilted-card-caption {
+    font-size: 0.72rem;
+    padding: 6px 10px;
   }
 
   /* Hakkımda / Stack */
   .about-stack-container {
-    margin-top: 40px;
-    padding-bottom: 48px;
     gap: 36px;
-    text-align: left;
   }
 
   .section-title {
