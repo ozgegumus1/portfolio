@@ -5,7 +5,77 @@ import TiltedCard from './TiltedCard';
 import WarpText from './WarpText';
 import ErrorBoundary from './ErrorBoundary';
 import SpecularButton from './SpecularButton';
+import EvilEye from './EvilEye';
 import './App.css';
+
+// --- Uzun paragraf metinlerini WarpText için önceden satırlara bölme ---
+// WarpText yalnızca elle konan "\n" karakterlerine göre satır kırıyor,
+// otomatik kaydırma yapmıyor. Bu yüzden paragrafı burada, gerçek konteyner
+// genişliğine göre kelime kelime sarıp \n ile birleştiriyoruz. WarpText'in
+// kendi iç boşluk oranlarını da (metin, kutunun %86 genişliğine ve %78
+// yüksekliğine sığdırılıyor) hesaba katıyoruz ki gereksiz küçülme olmasın.
+function wrapWords(ctx, text, maxWidth) {
+  const words = text.split(' ');
+  const lines = [];
+  let currentLine = '';
+  words.forEach((word) => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    if (ctx.measureText(testLine).width > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+  if (currentLine) lines.push(currentLine);
+  return lines;
+}
+
+function useWrappedParagraph(text, { fontWeight = 400, lineHeight = 1.6 } = {}) {
+  const containerRef = useRef(null);
+  const [result, setResult] = useState({ text, height: 300 });
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return undefined;
+
+    const measure = () => {
+      const rect = container.getBoundingClientRect();
+      if (rect.width <= 0) return;
+
+      const computed = window.getComputedStyle(container);
+      const fontSizePx = parseFloat(computed.fontSize) || 18;
+      const fontFamily = computed.fontFamily || 'sans-serif';
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.font = `${fontWeight} ${fontSizePx}px ${fontFamily}`;
+
+      // WarpText metni kutunun %86'sına sığdırıyor; biz de aynı sınırı
+      // kullanarak sarıyoruz ki WarpText ekstra küçültme yapmasın.
+      const wrapWidth = rect.width * 0.86;
+      const paragraphs = String(text).split('\n');
+      let allLines = [];
+      paragraphs.forEach((p) => {
+        allLines = allLines.concat(wrapWords(ctx, p, wrapWidth));
+      });
+
+      const lineHeightPx = fontSizePx * lineHeight;
+      // WarpText yüksekliğin %78'ini kullanıyor; gereken tam yüksekliği
+      // bu orana böl ki metin dikeyde de küçültülmesin.
+      const neededHeight = (lineHeightPx * allLines.length) / 0.78 + 12;
+
+      setResult({ text: allLines.join('\n'), height: Math.ceil(neededHeight) });
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, [text, fontWeight, lineHeight]);
+
+  return { containerRef, wrappedText: result.text, height: result.height };
+}
 
 // Proje görsellerinin içe aktarılması
 import routixImg from './work/Routix.jpeg';
@@ -119,6 +189,11 @@ export default function App() {
   const lastPos = useRef({ x: null, y: null });
   const themeRef = useRef(theme);
   themeRef.current = theme;
+
+  const aboutParagraphText =
+    "Siyaset Bilimi ve İşletme Yönetimi mezunuyum. Geliştirme sürecinde front-end için dinamik yapılara ve tip güvenliğine, back-end için veri tabanı yönetimi ile otomasyonlara odaklanıyorum. Projeleri, kullanıcı deneyiminden veri akışına kadar tüm teknik gereksinimleriyle bir bütün olarak ele alıyorum.";
+
+  const aboutWrap = useWrappedParagraph(aboutParagraphText, { fontWeight: 400, lineHeight: 1.6 });
 
   useEffect(() => {
     const canvas = scratchCanvasRef.current;
@@ -324,7 +399,7 @@ export default function App() {
                 text="Özge Gümüş"
                 className="warp-small-name"
                 color={theme === 'dark' ? '#ffffff' : '#111111'}
-                fontSize="clamp(0.85rem, 4vw, 1rem)"
+                fontSize="clamp(0.95rem, 4.5vw, 1.15rem)"
                 fontWeight={600}
                 letterSpacing="-0.01em"
                 lineHeight={1}
@@ -341,7 +416,7 @@ export default function App() {
                 text={'SOFTWARE\nDEVELOPER'}
                 className="warp-main-title"
                 color={theme === 'dark' ? '#ffffff' : '#111111'}
-                fontSize="clamp(1.9rem, 9.5vw, 4.5rem)"
+                fontSize="clamp(2.35rem, 11.8vw, 5.6rem)"
                 fontWeight={900}
                 letterSpacing="-0.04em"
                 lineHeight={0.95}
@@ -403,8 +478,24 @@ export default function App() {
                 />
               </ErrorBoundary>
             </h2>
-            <p className="about-text">
-              Siyaset Bilimi ve İşletme Yönetimi mezunuyum. Geliştirme sürecinde ön yüzde dinamik yapılara ve tip güvenliğine, arka planda ise veri tabanı yönetimi ile otomasyonlara odaklanıyorum. Projeleri, kullanıcı deneyiminden veri akışına kadar tüm teknik gereksinimleriyle bir bütün olarak ele alıyorum. Projelerimde dinamik veri yönetimi için API entegrasyonlarını ve Supabase'i aktif kullanıyor; arka plan süreçlerinde Python'dan yararlanıyorum. İş akışımda yapay zeka araçlarıyla geliştirme sürecini ve kod kalitesini optimize ediyorum. Ethical Hacker (siber güvenlik) eğitimim devam ediyor; Linux ve sanal makine (VirtualBox) ortamlarında rahatım. Sıfırdan tam fonksiyonel web uygulamaları geliştirebilecek teknik bağımsızlığa sahibim; temiz ve sürdürülebilir koda odaklanıyorum.
+            <p className="about-text" ref={aboutWrap.containerRef}>
+              <ErrorBoundary fallback={aboutParagraphText}>
+                <WarpText
+                  text={aboutWrap.wrappedText}
+                  className="warp-about-text"
+                  style={{ height: aboutWrap.height }}
+                  color={theme === 'dark' ? 'rgba(255,255,255,0.9)' : 'rgba(17,17,17,0.9)'}
+                  fontSize="inherit"
+                  fontWeight={400}
+                  fontFamily="inherit"
+                  letterSpacing="0"
+                  lineHeight={1.6}
+                  warpStrength={0.045}
+                  pointerInfluence={0.3}
+                  pointerStrength={0.22}
+                  refraction={0.01}
+                />
+              </ErrorBoundary>
             </p>
           </div>
 
@@ -477,6 +568,19 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* İmza: sol alt köşede küçük LOTR temalı animasyon */}
+      <div className="evil-eye-signature" title="✦">
+        <ErrorBoundary fallback={null}>
+          <EvilEye
+            eyeColor="#FF6F37"
+            backgroundColor={theme === 'dark' ? '#000000' : '#0a0a0a'}
+            lightMode={false}
+            scale={0.85}
+            intensity={1.4}
+          />
+        </ErrorBoundary>
+      </div>
     </div>
   );
 }

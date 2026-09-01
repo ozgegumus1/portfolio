@@ -145,7 +145,7 @@ html, body {
 .app-container.light .main-title { color: #111111; }
 
 .hero-desc {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 400;
   line-height: 1.5;
 }
@@ -155,7 +155,9 @@ html, body {
 /* WarpText Sarmalayıcı Boyutları — WarpText metni her zaman kendi
    kutusunun ortasına çizer, bu yüzden kutuyu metnin gerçek genişliğine
    (ch birimiyle, responsive) yaklaştırıp sola yaslı görünümü koruyoruz.
-   min-height: 0, bileşenin varsayılan 220px tabanını iptal eder. */
+   min-height: 0, bileşenin varsayılan 220px tabanını iptal eder.
+   width/margin-left ch biriminde olduğu için font-size büyüyünce
+   otomatik olarak orantılı büyür, hizalama bozulmaz. */
 .warp-main-title,
 .warp-small-name,
 .warp-section-title {
@@ -164,16 +166,16 @@ html, body {
 }
 
 .warp-main-title {
-  font-size: clamp(1.9rem, 9.5vw, 4.5rem);
+  font-size: clamp(2.35rem, 11.8vw, 5.6rem);
   width: 9.15ch;
   margin-left: -0.7ch;
-  height: clamp(76px, 23vw, 178px);
+  height: clamp(95px, 28.6vw, 222px);
 }
 
 .warp-small-name {
-  font-size: clamp(0.85rem, 4vw, 1rem);
+  font-size: clamp(0.95rem, 4.5vw, 1.15rem);
   width: 11ch;
-  height: 24px;
+  height: 28px;
 }
 
 .warp-section-title {
@@ -189,6 +191,15 @@ html, body {
 .warp-heading-about {
   width: 7.6ch;
   margin-left: -0.62ch;
+}
+
+/* Hakkımda paragrafı için WarpText: metin App.jsx tarafında satırlara
+   önceden bölünüp \n ile veriliyor (WarpText otomatik kaydırma yapmıyor),
+   yükseklik de satır sayısına göre JS'ten dinamik geliyor. */
+.warp-about-text {
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Projeler Grid */
@@ -447,7 +458,7 @@ html, body {
   }
 
   .hero-desc {
-    font-size: 0.88rem;
+    font-size: 0.97rem;
     line-height: 1.45;
   }
 
@@ -508,5 +519,29 @@ html, body {
 
   .modal-project-desc {
     font-size: 0.92rem;
+  }
+}
+
+/* İmza: sol alt köşede küçük LOTR (Gözü) animasyonu, buton büyüklüğünde */
+.evil-eye-signature {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 10;
+  pointer-events: none;
+  background: #000;
+  box-shadow: 0 0 12px rgba(255, 111, 55, 0.35);
+}
+
+@media (max-width: 640px) {
+  .evil-eye-signature {
+    width: 36px;
+    height: 36px;
+    bottom: 14px;
+    left: 14px;
   }
 }
