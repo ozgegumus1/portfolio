@@ -166,6 +166,7 @@ const GradientWaves = ({
         alpha: true,
         premultipliedAlpha: true,
         antialias: false,
+        preserveDrawingBuffer: true,
         dpr: Math.min(window.devicePixelRatio || 1, 2)
       });
       gl = renderer.gl;
@@ -336,13 +337,36 @@ const GradientWaves = ({
     const h = hexToRgb(horizonColor);
     const w = hexToRgb(waveColor);
     const cr = hexToRgb(crestColor);
-    hc[0] = h[0]; hc[1] = h[1]; hc[2] = h[2];
-    wc[0] = w[0]; wc[1] = w[1]; wc[2] = w[2];
-    cc[0] = cr[0]; cc[1] = cr[1]; cc[2] = cr[2];
+    hc[0] = h[0];
+    hc[1] = h[1];
+    hc[2] = h[2];
+    wc[0] = w[0];
+    wc[1] = w[1];
+    wc[2] = w[2];
+    cc[0] = cr[0];
+    cc[1] = cr[1];
+    cc[2] = cr[2];
   }, [
-    horizonColor, waveColor, crestColor, speed, amplitude, waveScale,
-    waveRatio, swell, turbulence, tilt, zoom, height, fogDepth, detail,
-    brightness, opacity, grain, grainIntensity, mouseInteraction, parallaxStrength
+    horizonColor,
+    waveColor,
+    crestColor,
+    speed,
+    amplitude,
+    waveScale,
+    waveRatio,
+    swell,
+    turbulence,
+    tilt,
+    zoom,
+    height,
+    fogDepth,
+    detail,
+    brightness,
+    opacity,
+    grain,
+    grainIntensity,
+    mouseInteraction,
+    parallaxStrength
   ]);
 
   return <div ref={containerRef} className={`gradient-waves-container ${className}`.trim()} />;

@@ -35,8 +35,8 @@ html, body {
 .app-container.dark { background-color: #0a0a0d; }
 .app-container.light { background-color: #f5f5f7; }
 
-/* Arkaplan Katmanı: WebGL efekti + kazıma canvas'ı her zaman
-   viewport'a sabit kalır, sayfa üzerinden kayar gibi görünür. */
+/* Arkaplan Katmanı: her iki tema arkaplanı da her zaman viewport'a sabit
+   kalır (sayfa üzerinden kayar), aktif olan üstte, diğeri altta gizli. */
 .bg-layer {
   position: fixed;
   inset: 0;
@@ -45,14 +45,27 @@ html, body {
   pointer-events: none;
 }
 
-.scratch-canvas {
+.bg-instance {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
+}
+
+.scratch-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
   pointer-events: none;
-  z-index: 1;
+}
+
+/* GradientWaves shader'ı ufuk/sis nedeniyle bazı bölgelerde kasıtlı olarak
+   saydamlaşıyor; kazıma ile ortaya çıkınca "delik" gibi görünmemesi için
+   kendi paletine yakın bir zemin rengi koyuyoruz. */
+.bg-instance-waves {
+  background: linear-gradient(135deg, #5227ff, #a855f7 45%, #ff9ffc 100%);
 }
 
 /* Üst Sağ Navigasyon */

@@ -113,17 +113,24 @@ export default function App() {
   const [theme, setTheme] = useState('dark');
   const [selectedProject, setSelectedProject] = useState(null);
   const scratchCanvasRef = useRef(null);
+  const darkBgContainerRef = useRef(null);
+  const lightBgContainerRef = useRef(null);
   const strokesRef = useRef([]);
   const lastPos = useRef({ x: null, y: null });
+  const themeRef = useRef(theme);
+  themeRef.current = theme;
 
   useEffect(() => {
     const canvas = scratchCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
     };
 
     resize();
@@ -132,10 +139,31 @@ export default function App() {
     let animationFrameId;
 
     const render = () => {
+      const activeContainer = themeRef.current === 'dark' ? darkBgContainerRef.current : lightBgContainerRef.current;
+      const activeCanvas = activeContainer?.querySelector('canvas');
+
+      // Aktif temanın canlı WebGL karesini ham piksel çözünürlüğünde kopyala
+      // (Retina ekranlarda net görünmesi için).
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      ctx.fillStyle = theme === 'dark' ? '#0a0a0c' : '#f4f4f6';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // GradientWaves shader'ı sis/ufuk nedeniyle bazı bölgelerde kasıtlı
+      // olarak saydamlaşıyor; bunu olduğu gibi kopyalarsak altındaki diğer
+      // tema her yerden sızar (sadece kazınan yerde değil). Bu yüzden önce
+      // temaya uygun solid bir zemin koyup WebGL karesini onun üstüne
+      // çiziyoruz — böylece aktif tema HER ZAMAN tam opak görünür.
+      if (themeRef.current === 'dark') {
+        const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        grad.addColorStop(0, '#5227ff');
+        grad.addColorStop(0.45, '#a855f7');
+        grad.addColorStop(1, '#ff9ffc');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      if (activeCanvas && activeCanvas.width > 0 && activeCanvas.height > 0) {
+        ctx.drawImage(activeCanvas, 0, 0, canvas.width, canvas.height);
+      }
 
       strokesRef.current.forEach((p) => {
         p.opacity -= 0.05;
@@ -143,6 +171,9 @@ export default function App() {
       strokesRef.current = strokesRef.current.filter((p) => p.opacity > 0);
 
       if (strokesRef.current.length > 0) {
+        // Silme dairelerini CSS piksel koordinat sistemine geçerek çiz
+        // (fare/dokunuş konumlarıyla birebir eşleşsin diye).
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
         strokesRef.current.forEach((p) => {
@@ -188,18 +219,12 @@ export default function App() {
     };
 
     const handleMouseMove = (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      scratchAt(x, y);
+      scratchAt(e.clientX, e.clientY);
     };
 
     const handleTouchMove = (e) => {
       if (!e.touches[0]) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = e.touches[0].clientX - rect.left;
-      const y = e.touches[0].clientY - rect.top;
-      scratchAt(x, y);
+      scratchAt(e.touches[0].clientX, e.touches[0].clientY);
     };
 
     const handleReset = () => {
@@ -208,7 +233,7 @@ export default function App() {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleReset);
-    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
     window.addEventListener('touchend', handleReset);
 
     return () => {
@@ -219,7 +244,7 @@ export default function App() {
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleReset);
     };
-  }, [theme]);
+  }, []);
 
   // CV İndirme Fonksiyonu
   const handleDownloadCV = () => {
@@ -233,18 +258,31 @@ export default function App() {
 
   return (
     <div className={`app-container ${theme}`}>
-      {/* Arkaplan Katmanı: viewport'a sabit, sayfa üzerinden kayar */}
+      {/* Arkaplan Katmanı: viewport'a sabit, sayfa üzerinden kayar.
+          Her iki tema arkaplanı da HER ZAMAN yüklü kalır; aktif olan üstte
+          tam görünür, diğeri altta gizlenir. Kazıma efekti üstteki katmana
+          gerçek bir delik açarak alttaki (diğer tema) arkaplanı gösterir. */}
       <div className="bg-layer">
-        {theme === 'dark' ? (
-          <Iridescence color1="#ff7eb3" color2="#7afcff" speed={1.2} />
-        ) : (
-          <GradientWaves
-            horizonColor="#5227FF"
-            waveColor="#FF9FFC"
-            crestColor="#FFFFFF"
-            speed={0.4}
-          />
-        )}
+        {/* İnaktif tema arkaplanı: her zaman tam görünür, altta durur.
+            Aktif temanın arkaplanı ise görsel olarak GİZLİDİR (opacity:0)
+            ama WebGL'i çalışmaya devam eder — kazıma canvas'ı onun canlı
+            görüntüsünü her karede kopyalar ve delik açtığı yerlerde bu
+            inaktif katmanı gösterir. Bu, tüm tarayıcılarda (Safari dahil)
+            güvenilir çalışan klasik Canvas2D yöntemidir. */}
+        <div
+          ref={darkBgContainerRef}
+          className="bg-instance bg-instance-waves"
+          style={{ zIndex: 1, opacity: theme === 'dark' ? 0 : 1 }}
+        >
+          <GradientWaves mouseInteraction={false} />
+        </div>
+        <div
+          ref={lightBgContainerRef}
+          className="bg-instance"
+          style={{ zIndex: 1, opacity: theme === 'light' ? 0 : 1 }}
+        >
+          <Iridescence mouseReact={false} />
+        </div>
         <canvas ref={scratchCanvasRef} className="scratch-canvas" />
       </div>
 
