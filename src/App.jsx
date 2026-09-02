@@ -191,7 +191,7 @@ export default function App() {
   themeRef.current = theme;
 
   const aboutParagraphText =
-    "Siyaset Bilimi ve İşletme Yönetimi mezunuyum. Geliştirme sürecinde front-end için dinamik yapılara ve tip güvenliğine, back-end için veri tabanı yönetimi ile otomasyonlara odaklanıyorum. Projeleri, kullanıcı deneyiminden veri akışına kadar tüm teknik gereksinimleriyle bir bütün olarak ele alıyorum.";
+    "Siyaset Bilimi ve İşletme Yönetimi mezunuyum. Geliştirme sürecinde ön yüzde dinamik yapılara ve tip güvenliğine, arka planda ise veri tabanı yönetimi ile otomasyonlara odaklanıyorum. Projeleri, kullanıcı deneyiminden veri akışına kadar tüm teknik gereksinimleriyle bir bütün olarak ele alıyorum.";
 
   const aboutWrap = useWrappedParagraph(aboutParagraphText, { fontWeight: 400, lineHeight: 1.6 });
 
@@ -229,9 +229,9 @@ export default function App() {
       // çiziyoruz — böylece aktif tema HER ZAMAN tam opak görünür.
       if (themeRef.current === 'dark') {
         const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        grad.addColorStop(0, '#5227ff');
-        grad.addColorStop(0.45, '#a855f7');
-        grad.addColorStop(1, '#ff9ffc');
+        grad.addColorStop(0, '#060b16');
+        grad.addColorStop(0.45, '#0f2747');
+        grad.addColorStop(1, '#3fd8ff');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
@@ -349,7 +349,12 @@ export default function App() {
           className="bg-instance bg-instance-waves"
           style={{ zIndex: 1, opacity: theme === 'dark' ? 0 : 1 }}
         >
-          <GradientWaves mouseInteraction={false} />
+          <GradientWaves
+            mouseInteraction={false}
+            horizonColor="#060b16"
+            waveColor="#0f2747"
+            crestColor="#3fd8ff"
+          />
         </div>
         <div
           ref={lightBgContainerRef}
@@ -458,47 +463,8 @@ export default function App() {
           ))}
         </div>
 
-        {/* Hakkımda ve Stack Bölümü — projelerin hemen altında, normal sayfa akışında */}
+        {/* Stack ve Hakkımda Paragrafı — projelerin hemen altında, normal sayfa akışında */}
         <div className="about-stack-container">
-          <div className="about-section">
-            <h2 className="section-title">
-              <ErrorBoundary fallback="Hakkımda">
-                <WarpText
-                  text="Hakkımda"
-                  className="warp-section-title warp-heading-about"
-                  color={theme === 'dark' ? '#ffffff' : '#111111'}
-                  fontSize="clamp(1.5rem, 6vw, 2rem)"
-                  fontWeight={800}
-                  letterSpacing="-0.02em"
-                  lineHeight={1}
-                  warpStrength={0.05}
-                  pointerInfluence={0.32}
-                  pointerStrength={0.26}
-                  refraction={0.012}
-                />
-              </ErrorBoundary>
-            </h2>
-            <p className="about-text" ref={aboutWrap.containerRef}>
-              <ErrorBoundary fallback={aboutParagraphText}>
-                <WarpText
-                  text={aboutWrap.wrappedText}
-                  className="warp-about-text"
-                  style={{ height: aboutWrap.height }}
-                  color={theme === 'dark' ? 'rgba(255,255,255,0.9)' : 'rgba(17,17,17,0.9)'}
-                  fontSize="inherit"
-                  fontWeight={400}
-                  fontFamily="inherit"
-                  letterSpacing="0"
-                  lineHeight={1.6}
-                  warpStrength={0.045}
-                  pointerInfluence={0.3}
-                  pointerStrength={0.22}
-                  refraction={0.01}
-                />
-              </ErrorBoundary>
-            </p>
-          </div>
-
           <div className="stack-section">
             <h2 className="section-title">
               <ErrorBoundary fallback="Stack">
@@ -522,6 +488,28 @@ export default function App() {
                 <span key={index} className="stack-tag">{tech}</span>
               ))}
             </div>
+          </div>
+
+          <div className="about-section">
+            <p className="about-text" ref={aboutWrap.containerRef}>
+              <ErrorBoundary fallback={aboutParagraphText}>
+                <WarpText
+                  text={aboutWrap.wrappedText}
+                  className="warp-about-text"
+                  style={{ height: aboutWrap.height }}
+                  color={theme === 'dark' ? 'rgba(255,255,255,0.9)' : 'rgba(17,17,17,0.9)'}
+                  fontSize="inherit"
+                  fontWeight={400}
+                  fontFamily="inherit"
+                  letterSpacing="0"
+                  lineHeight={1.6}
+                  warpStrength={0.045}
+                  pointerInfluence={0.3}
+                  pointerStrength={0.22}
+                  refraction={0.01}
+                />
+              </ErrorBoundary>
+            </p>
           </div>
         </div>
       </div>

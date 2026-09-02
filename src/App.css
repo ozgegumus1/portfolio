@@ -65,7 +65,7 @@ html, body {
    saydamlaşıyor; kazıma ile ortaya çıkınca "delik" gibi görünmemesi için
    kendi paletine yakın bir zemin rengi koyuyoruz. */
 .bg-instance-waves {
-  background: linear-gradient(135deg, #5227ff, #a855f7 45%, #ff9ffc 100%);
+  background: linear-gradient(135deg, #060b16, #0f2747 45%, #3fd8ff 100%);
 }
 
 /* Üst Sağ Navigasyon */
@@ -94,16 +94,14 @@ html, body {
 
 .app-container.dark .theme-toggle {
   color: #fff;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
+  background: transparent;
+  border: none;
 }
 
 .app-container.light .theme-toggle {
   color: #111;
-  background: rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(10px);
+  background: transparent;
+  border: none;
 }
 
 .theme-toggle:hover {
